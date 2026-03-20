@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Netherlands — Enriched Economic Profile Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<style>
+:root {
+    --bg:#f0f2f5; --card:#fff; --hdr:#1e3a5f; --hdr2:#e87722;
+    --txt:#1a1a2e; --txt2:#5a6677; --txtw:#fff;
+    --c1:#1e3a5f; --c2:#e87722; --c3:#2e8b57; --c4:#c0392b; --c5:#8e44ad;
+    --c6:#2980b9; --c7:#d4a017; --c8:#16a085; --c9:#e74c3c; --c10:#34495e;
+    --pos:#27ae60; --neg:#e74c3c; --gap:14px; --rad:10px;
+    --sh:0 2px 8px rgba(0,0,0,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;font-size:13px}
+.wrap{max-width:1480px;margin:0 auto;padding:var(--gap)}
+header.hdr{background:linear-gradient(135deg,var(--hdr) 0%,#2c5282 60%,#1a365d 100%);color:var(--txtw);padding:22px 28px;border-radius:var(--rad);margin-bottom:var(--gap);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.hdr-left h1{font-size:22px;font-weight:700}
+.hdr-left .sub{font-size:12px;opacity:.8;margin-top:2px}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,.15);padding:3px 10px;border-radius:16px;font-size:10px;font-weight:600;letter-spacing:.4px}
+nav.tabs{display:flex;gap:3px;background:var(--card);padding:5px;border-radius:var(--rad);margin-bottom:var(--gap);overflow-x:auto;box-shadow:var(--sh)}
+.tbtn{padding:9px 16px;border:none;background:0;border-radius:6px;font-size:12px;font-weight:500;color:var(--txt2);cursor:pointer;white-space:nowrap;transition:all .2s}
+.tbtn:hover{background:#e8ecf1;color:var(--txt)} .tbtn.act{background:var(--hdr);color:#fff}
+.tc{display:none} .tc.act{display:block}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.kc{background:var(--card);border-radius:var(--rad);padding:16px 20px;box-shadow:var(--sh);border-left:4px solid var(--c1)}
+.kc.o{border-left-color:var(--c2)} .kc.g{border-left-color:var(--c3)} .kc.r{border-left-color:var(--c4)} .kc.p{border-left-color:var(--c5)} .kc.b{border-left-color:var(--c6)} .kc.y{border-left-color:var(--c7)} .kc.t{border-left-color:var(--c8)}
+.kl{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.kv{font-size:24px;font-weight:700} .ks{font-size:11px;color:var(--txt2);margin-top:1px}
+.kch{font-size:11px;font-weight:600;margin-top:3px} .kch.pos{color:var(--pos)} .kch.neg{color:var(--neg)}
+.cr{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:var(--gap);margin-bottom:var(--gap)}
+.cr.tri{grid-template-columns:repeat(auto-fit,minmax(310px,1fr))}
+.cc{background:var(--card);border-radius:var(--rad);padding:18px 22px;box-shadow:var(--sh)}
+.cc.fw{grid-column:1/-1} .cc.hw{min-height:200px}
+.ct{font-size:13px;font-weight:600;margin-bottom:3px} .cst{font-size:10px;color:var(--txt2);margin-bottom:14px}
+.cc canvas{max-height:310px}
+.ts{background:var(--card);border-radius:var(--rad);padding:18px 22px;box-shadow:var(--sh);overflow-x:auto;margin-bottom:var(--gap)}
+.ts h3{font-size:13px;font-weight:600;margin-bottom:10px}
+table.dt{width:100%;border-collapse:collapse;font-size:12px}
+.dt thead th{text-align:left;padding:8px 10px;border-bottom:2px solid #dee2e6;color:var(--txt2);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.dt tbody td{padding:8px 10px;border-bottom:1px solid #f0f0f0} .dt tbody tr:hover{background:#f8f9fa} .dt tbody tr:last-child td{border-bottom:none}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.forecast-badge{display:inline-block;background:#fff3cd;color:#856404;font-size:9px;font-weight:600;padding:1px 6px;border-radius:8px;margin-left:4px}
+footer.ft{text-align:center;padding:18px;color:var(--txt2);font-size:10px;border-top:1px solid #dee2e6;margin-top:var(--gap);line-height:1.7}
+@media(max-width:768px){header.hdr{flex-direction:column;align-items:flex-start}.kr{grid-template-columns:repeat(2,1fr)}.cr,.cr.tri{grid-template-columns:1fr}}
+@media print{body{background:#fff}.tabs{display:none}.tc{display:block!important;page-break-before:always}.tc:first-of-type{page-break-before:avoid}.cc,.kc{break-inside:avoid;box-shadow:none;border:1px solid #dee2e6}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hdr">
+<div class="hdr-left">
+<span style="font-size:38px">🇳🇱</span>
+<div><h1>The Netherlands — Economic Profile</h1>
+<div class="sub">Enriched dashboard • CBS · Eurostat · ECB · IMF · CPB · World Bank • All values in EUR • 2000–2027F</div></div>
+</div>
+<div class="badges">
+<span class="badge">CBS / StatLine</span><span class="badge">Eurostat</span><span class="badge">ECB</span>
+<span class="badge">IMF WEO</span><span class="badge">CPB</span><span class="badge">World Bank</span>
+</div>
+</header>
+
+<nav class="tabs" id="tabBar">
+<button class="tbtn act" onclick="st('overview',this)">Overview</button>
+<button class="tbtn" onclick="st('macro',this)">Macroeconomic</button>
+<button class="tbtn" onclick="st('trade',this)">Trade & Investment</button>
+<button class="tbtn" onclick="st('fiscal',this)">Fiscal & Public Finance</button>
+<button class="tbtn" onclick="st('monetary',this)">Monetary & Financial</button>
+<button class="tbtn" onclick="st('labor',this)">Labor & Demographics</button>
+<button class="tbtn" onclick="st('innov',this)">Innovation</button>
+<button class="tbtn" onclick="st('climate',this)">Climate & Sustainability</button>
+</nav>
+
+<!-- ===================== TAB 1: OVERVIEW ===================== -->
+<div class="tc act" id="t-overview">
+<div class="kr">
+<div class="kc"><div class="kl">GDP (2024)</div><div class="kv">€910 B</div><div class="ks">CBS — 5th largest in EU</div><div class="kch pos">+0.8% real growth</div></div>
+<div class="kc o"><div class="kl">GDP per Capita</div><div class="kv">€50,600</div><div class="ks">CBS, 2024</div><div class="kch pos">+1.2% y/y</div></div>
+<div class="kc g"><div class="kl">Population</div><div class="kv">17.99M</div><div class="ks">CBS, Jan 2025</div><div class="kch pos">+0.65% y/y</div></div>
+<div class="kc p"><div class="kl">Unemployment</div><div class="kv">3.6%</div><div class="ks">CBS Labour Force Survey</div><div class="kch pos">EU avg: 6.0%</div></div>
+<div class="kc r"><div class="kl">Inflation (HICP)</div><div class="kv">3.3%</div><div class="ks">CBS/ECB, 2024 avg</div><div class="kch neg">Down from 11.6% in 2022</div></div>
+<div class="kc b"><div class="kl">Current Account</div><div class="kv">+9.2%</div><div class="ks">% of GDP — DNB/IMF</div><div class="kch pos">Persistent surplus</div></div>
+<div class="kc y"><div class="kl">Gov. Debt</div><div class="kv">46.5%</div><div class="ks">% of GDP — CBS/Eurostat</div><div class="kch pos">Below Maastricht 60%</div></div>
+<div class="kc t"><div class="kl">Consumer Confidence</div><div class="kv">-19</div><div class="ks">CBS, avg 2024</div><div class="kch neg">Below long-term avg (-4)</div></div>
+</div>
+<div class="kr">
+<div class="kc b"><div class="kl">CPB Forecast 2025</div><div class="kv">+1.6%</div><div class="ks">GDP growth — CEP 2025</div><div class="kch pos"><span class="forecast-badge">FORECAST</span></div></div>
+<div class="kc o"><div class="kl">CPB Forecast 2026</div><div class="kv">+1.4%</div><div class="ks">GDP growth — CEP 2025</div><div class="kch pos"><span class="forecast-badge">FORECAST</span></div></div>
+<div class="kc g"><div class="kl">New Businesses (2024)</div><div class="kv">213,000</div><div class="ks">KvK registrations</div><div class="kch pos">+2.1% y/y</div></div>
+<div class="kc r"><div class="kl">Bankruptcies (2024)</div><div class="kv">4,820</div><div class="ks">CBS</div><div class="kch neg">+28% y/y (normalizing)</div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">GDP Trajectory (€ billions, current prices)</div><div class="cst">Source: CBS StatLine / Eurostat · Dashed = CPB forecast</div><canvas id="ov-gdp"></canvas></div>
+<div class="cc"><div class="ct">Netherlands vs EU-27 Benchmark (2024)</div><div class="cst">Indexed: EU-27 = 100 · Sources: Eurostat, CBS, ECB</div><canvas id="ov-radar"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Quarterly GDP Growth (%, q/q, seasonally adjusted)</div><div class="cst">Source: CBS · 2019 Q1 – 2024 Q4</div><canvas id="ov-qgdp"></canvas></div>
+<div class="cc"><div class="ct">Consumer & Producer Confidence</div><div class="cst">Source: CBS Conjunctuurenquête · Monthly average per year</div><canvas id="ov-conf"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc fw"><div class="ct">Key Indicators Timeline (2000–2024)</div><div class="cst">GDP growth, unemployment, inflation — Sources: CBS, ECB, IMF</div><canvas id="ov-multi"></canvas></div>
+</div>
+</div>
+
+<!-- ===================== TAB 2: MACROECONOMIC ===================== -->
+<div class="tc" id="t-macro">
+<div class="kr">
+<div class="kc"><div class="kl">Nominal GDP (2024)</div><div class="kv">€910 B</div><div class="ks">CBS national accounts</div></div>
+<div class="kc o"><div class="kl">GDP per capita (PPS)</div><div class="kv">€47,600</div><div class="ks">Eurostat, 2023 · EU=100: 131</div></div>
+<div class="kc g"><div class="kl">Services</div><div class="kv">70.1%</div><div class="ks">% of GVA, CBS</div></div>
+<div class="kc b"><div class="kl">Industry</div><div class="kv">18.3%</div><div class="ks">% of GVA, CBS</div></div>
+<div class="kc p"><div class="kl">Economic Growth 2025F</div><div class="kv">+1.6%</div><div class="ks">CPB CEP 2025</div><div class="kch pos"><span class="forecast-badge">FORECAST</span></div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Real GDP Growth (annual %)</div><div class="cst">Sources: CBS / IMF WEO · Dashed = CPB forecast</div><canvas id="ma-grow"></canvas></div>
+<div class="cc"><div class="ct">GDP per Capita (€, current prices)</div><div class="cst">Source: CBS StatLine</div><canvas id="ma-gdppc"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">GDP Composition by Sector (% of GVA)</div><div class="cst">Source: CBS national accounts</div><canvas id="ma-sect"></canvas></div>
+<div class="cc"><div class="ct">GDP Composition 2023</div><div class="cst">Source: CBS StatLine</div><canvas id="ma-donut"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">GDP per Capita in PPS — EU Comparison (EU-27=100)</div><div class="cst">Source: Eurostat · 2023</div><canvas id="ma-eupps"></canvas></div>
+<div class="cc"><div class="ct">CPB Macro Forecasts (2025–2027)</div><div class="cst">Source: CPB Centraal Economisch Plan 2025</div><canvas id="ma-cpb"></canvas></div>
+</div>
+</div>
+
+<!-- ===================== TAB 3: TRADE ===================== -->
+<div class="tc" id="t-trade">
+<div class="kr">
+<div class="kc"><div class="kl">Trade Openness</div><div class="kv">162%</div><div class="ks">Trade/GDP, CBS 2023</div></div>
+<div class="kc o"><div class="kl">Goods Exports</div><div class="kv">€620 B</div><div class="ks">CBS, 2024</div></div>
+<div class="kc g"><div class="kl">Current Account</div><div class="kv">+9.2%</div><div class="ks">% GDP, DNB 2024</div></div>
+<div class="kc b"><div class="kl">FDI Stock (inward)</div><div class="kv">€4.7T</div><div class="ks">DNB, 2023 — but much is SPEs</div></div>
+<div class="kc p"><div class="kl">Re-exports Share</div><div class="kv">~48%</div><div class="ks">% of goods exports, CBS</div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Goods Exports & Imports (€ billions)</div><div class="cst">Source: CBS StatLine</div><canvas id="tr-vol"></canvas></div>
+<div class="cc"><div class="ct">Current Account Balance (% of GDP)</div><div class="cst">Source: DNB / IMF BOP</div><canvas id="tr-ca"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Exports by Product Group (2023, € billions)</div><div class="cst">Source: CBS International Trade</div><canvas id="tr-prod"></canvas></div>
+<div class="cc"><div class="ct">FDI Flows (% of GDP)</div><div class="cst">Source: World Bank / DNB</div><canvas id="tr-fdi"></canvas></div>
+</div>
+<div class="ts">
+<h3>Top 10 Trading Partners — Goods Exports 2023 (CBS)</h3>
+<table class="dt"><thead><tr><th>Rank</th><th>Partner</th><th>Exports (€B)</th><th>Share</th><th>Key Sectors</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>🇩🇪 Germany</td><td class="n">€132.8</td><td class="n">22.5%</td><td>Machinery, chemicals, food & agri</td></tr>
+<tr><td>2</td><td>🇧🇪 Belgium</td><td class="n">€71.4</td><td class="n">12.1%</td><td>Chemicals, refined petroleum, plastics</td></tr>
+<tr><td>3</td><td>🇫🇷 France</td><td class="n">€46.0</td><td class="n">7.8%</td><td>Machinery, food & beverages, chemicals</td></tr>
+<tr><td>4</td><td>🇬🇧 United Kingdom</td><td class="n">€42.5</td><td class="n">7.2%</td><td>Mineral fuels, machinery, food</td></tr>
+<tr><td>5</td><td>🇺🇸 United States</td><td class="n">€27.1</td><td class="n">4.6%</td><td>Machinery, optical/medical instruments, pharma</td></tr>
+<tr><td>6</td><td>🇮🇹 Italy</td><td class="n">€23.0</td><td class="n">3.9%</td><td>Chemicals, machinery, food</td></tr>
+<tr><td>7</td><td>🇪🇸 Spain</td><td class="n">€18.3</td><td class="n">3.1%</td><td>Chemicals, machinery, plastics</td></tr>
+<tr><td>8</td><td>🇵🇱 Poland</td><td class="n">€16.5</td><td class="n">2.8%</td><td>Machinery, transport equipment</td></tr>
+<tr><td>9</td><td>🇨🇳 China</td><td class="n">€14.2</td><td class="n">2.4%</td><td>Machinery (ASML), food, chemicals</td></tr>
+<tr><td>10</td><td>🇸🇪 Sweden</td><td class="n">€11.2</td><td class="n">1.9%</td><td>Chemicals, refined petroleum, machinery</td></tr>
+</tbody></table>
+</div>
+<div class="ts">
+<h3>Trade by Product Category — Top Exports 2023 (CBS)</h3>
+<table class="dt"><thead><tr><th>Category</th><th>Value (€B)</th><th>Share</th><th>Change y/y</th></tr></thead>
+<tbody>
+<tr><td>Machinery & transport equipment</td><td class="n">€152</td><td class="n">25.8%</td><td class="n">+4.2%</td></tr>
+<tr><td>Chemicals & related products</td><td class="n">€105</td><td class="n">17.8%</td><td class="n">-3.5%</td></tr>
+<tr><td>Mineral fuels & lubricants</td><td class="n">€82</td><td class="n">13.9%</td><td class="n">-18.2%</td></tr>
+<tr><td>Food & live animals</td><td class="n">€72</td><td class="n">12.2%</td><td class="n">+1.8%</td></tr>
+<tr><td>Manufactured goods</td><td class="n">€58</td><td class="n">9.8%</td><td class="n">-2.1%</td></tr>
+<tr><td>Miscellaneous manufactured articles</td><td class="n">€48</td><td class="n">8.1%</td><td class="n">+2.5%</td></tr>
+</tbody></table>
+</div>
+</div>
+
+<!-- ===================== TAB 4: FISCAL ===================== -->
+<div class="tc" id="t-fiscal">
+<div class="kr">
+<div class="kc"><div class="kl">Gov. Debt (% GDP)</div><div class="kv">46.5%</div><div class="ks">Eurostat/CBS 2024</div><div class="kch pos">Below Maastricht 60%</div></div>
+<div class="kc o"><div class="kl">Fiscal Balance</div><div class="kv">-1.8%</div><div class="ks">% GDP, CBS/CPB 2024</div></div>
+<div class="kc g"><div class="kl">Gov. Revenue</div><div class="kv">43.8%</div><div class="ks">% GDP, CBS</div></div>
+<div class="kc b"><div class="kl">Gov. Expenditure</div><div class="kv">45.6%</div><div class="ks">% GDP, CBS</div></div>
+<div class="kc p"><div class="kl">Tax-to-GDP Ratio</div><div class="kv">39.8%</div><div class="ks">Eurostat, 2023</div></div>
+<div class="kc r"><div class="kl">CPB 2025F: Deficit</div><div class="kv">-2.5%</div><div class="ks">% GDP</div><div class="kch neg"><span class="forecast-badge">FORECAST</span></div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Government Debt (% of GDP)</div><div class="cst">NL vs Maastricht limit · Sources: Eurostat, CBS, IMF</div><canvas id="fi-debt"></canvas></div>
+<div class="cc"><div class="ct">Fiscal Balance (% of GDP)</div><div class="cst">Gen. gov. net lending/borrowing · Sources: CBS, IMF, CPB</div><canvas id="fi-bal"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Revenue vs Expenditure (% of GDP)</div><div class="cst">Source: CBS / IMF Fiscal Monitor</div><canvas id="fi-revexp"></canvas></div>
+<div class="cc"><div class="ct">Government Spending by Function (2023, % of total)</div><div class="cst">Source: CBS / Eurostat COFOG</div><canvas id="fi-cofog"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc fw"><div class="ct">Government Debt — EU Comparison (% of GDP, 2024)</div><div class="cst">Source: Eurostat</div><canvas id="fi-eudebt"></canvas></div>
+</div>
+</div>
+
+<!-- ===================== TAB 5: MONETARY ===================== -->
+<div class="tc" id="t-monetary">
+<div class="kr">
+<div class="kc"><div class="kl">ECB Refi Rate</div><div class="kv">2.65%</div><div class="ks">As of Mar 2025</div></div>
+<div class="kc o"><div class="kl">HICP Inflation (NL)</div><div class="kv">3.3%</div><div class="ks">2024 avg, CBS/ECB</div></div>
+<div class="kc g"><div class="kl">House Price Index</div><div class="kv">173</div><div class="ks">CBS, 2024 · 2015=100</div><div class="kch pos">+8.5% y/y</div></div>
+<div class="kc b"><div class="kl">Mortgage Debt</div><div class="kv">€755 B</div><div class="ks">DNB, 2024</div></div>
+<div class="kc p"><div class="kl">Household Savings Rate</div><div class="kv">14.8%</div><div class="ks">CBS, 2024</div></div>
+<div class="kc r"><div class="kl">CPB 2025F: Inflation</div><div class="kv">2.9%</div><div class="ks">CPI</div><div class="kch pos"><span class="forecast-badge">FORECAST</span></div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Inflation: NL vs Euro Area (HICP, annual %)</div><div class="cst">Source: ECB SDW / CBS</div><canvas id="mo-infl"></canvas></div>
+<div class="cc"><div class="ct">ECB Key Interest Rates</div><div class="cst">Main refinancing rate · Source: ECB</div><canvas id="mo-rate"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">House Price Index (2015=100)</div><div class="cst">Source: CBS / Kadaster</div><canvas id="mo-house"></canvas></div>
+<div class="cc"><div class="ct">Household Savings Rate (%)</div><div class="cst">Source: CBS national accounts</div><canvas id="mo-save"></canvas></div>
+</div>
+</div>
+
+<!-- ===================== TAB 6: LABOR ===================== -->
+<div class="tc" id="t-labor">
+<div class="kr">
+<div class="kc"><div class="kl">Unemployment</div><div class="kv">3.6%</div><div class="ks">CBS LFS, 2024</div><div class="kch pos">Near historic low</div></div>
+<div class="kc o"><div class="kl">Youth Unempl.</div><div class="kv">8.8%</div><div class="ks">15-24, CBS</div></div>
+<div class="kc g"><div class="kl">Labor Participation</div><div class="kv">73.2%</div><div class="ks">15+, CBS 2024</div></div>
+<div class="kc b"><div class="kl">Vacancies</div><div class="kv">385,000</div><div class="ks">CBS, avg Q3 2024</div></div>
+<div class="kc p"><div class="kl">Self-Employed (ZZP)</div><div class="kv">1.2M</div><div class="ks">CBS, 2024</div><div class="kch pos">13.4% of workforce</div></div>
+<div class="kc y"><div class="kl">Flex Workers</div><div class="kv">2.1M</div><div class="ks">CBS, 2024</div></div>
+<div class="kc r"><div class="kl">Population 65+</div><div class="kv">20.5%</div><div class="ks">CBS, 2024</div></div>
+<div class="kc t"><div class="kl">Net Migration</div><div class="kv">+86,000</div><div class="ks">CBS, 2024</div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Unemployment (% of labor force)</div><div class="cst">Total, male, female, youth · Source: CBS LFS</div><canvas id="la-unemp"></canvas></div>
+<div class="cc"><div class="ct">Labor Force Participation (%)</div><div class="cst">Total, male, female · Source: CBS / Eurostat</div><canvas id="la-lfp"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Employment Type: Fixed, Flex & Self-Employed (millions)</div><div class="cst">Source: CBS Labour Force Survey</div><canvas id="la-type"></canvas></div>
+<div class="cc"><div class="ct">Open Vacancies (×1,000) vs Unemployment Rate</div><div class="cst">Source: CBS · Beveridge curve dynamics</div><canvas id="la-vac"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Population & Aging</div><div class="cst">Total population & 65+ share · Source: CBS</div><canvas id="la-pop"></canvas></div>
+<div class="cc"><div class="ct">Youth Unemployment — EU Comparison (2024, %)</div><div class="cst">Source: Eurostat LFS</div><canvas id="la-euyouth"></canvas></div>
+</div>
+</div>
+
+<!-- ===================== TAB 7: INNOVATION ===================== -->
+<div class="tc" id="t-innov">
+<div class="kr">
+<div class="kc"><div class="kl">R&D Expenditure</div><div class="kv">2.32%</div><div class="ks">% GDP, CBS/Eurostat 2023</div></div>
+<div class="kc o"><div class="kl">New Businesses</div><div class="kv">213,000</div><div class="ks">KvK, 2024</div></div>
+<div class="kc g"><div class="kl">High-Tech Exports</div><div class="kv">19.8%</div><div class="ks">% manufactured exports</div></div>
+<div class="kc b"><div class="kl">Internet Users</div><div class="kv">98.1%</div><div class="ks">CBS, 2024</div></div>
+<div class="kc p"><div class="kl">Innovation Score</div><div class="kv">6th</div><div class="ks">EU Innovation Scoreboard 2024</div></div>
+<div class="kc y"><div class="kl">EPO Patents</div><div class="kv">7,100</div><div class="ks">WIPO/EPO, 2023</div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">R&D Expenditure (% of GDP)</div><div class="cst">NL vs EU avg · Source: CBS / Eurostat</div><canvas id="in-rd"></canvas></div>
+<div class="cc"><div class="ct">New Business Registrations (×1,000)</div><div class="cst">Source: KvK / CBS</div><canvas id="in-biz"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Digital Connectivity</div><div class="cst">Internet users & mobile subs · Source: CBS / World Bank</div><canvas id="in-dig"></canvas></div>
+<div class="cc"><div class="ct">EU Innovation Scoreboard — Top 10 (2024 index)</div><div class="cst">Source: European Commission</div><canvas id="in-euscore"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">Bankruptcies per Year</div><div class="cst">Source: CBS</div><canvas id="in-bankr"></canvas></div>
+<div class="cc"><div class="ct">High-Tech Exports (% of manufactured exports)</div><div class="cst">Source: World Bank / CBS</div><canvas id="in-ht"></canvas></div>
+</div>
+</div>
+
+<!-- ===================== TAB 8: CLIMATE ===================== -->
+<div class="tc" id="t-climate">
+<div class="kr">
+<div class="kc"><div class="kl">CO₂ per Capita</div><div class="kv">7.8 t</div><div class="ks">CBS/RIVM, 2022</div><div class="kch pos">Down from 11.1t in 2000</div></div>
+<div class="kc o"><div class="kl">Total GHG Emissions</div><div class="kv">148 Mt CO₂eq</div><div class="ks">CBS, 2023 (prov.)</div></div>
+<div class="kc g"><div class="kl">Renewable Energy</div><div class="kv">15.2%</div><div class="ks">% final energy, CBS 2023</div></div>
+<div class="kc b"><div class="kl">Wind Capacity</div><div class="kv">10.8 GW</div><div class="ks">CBS/RVO, 2024</div></div>
+<div class="kc p"><div class="kl">Solar PV Capacity</div><div class="kv">24.5 GW</div><div class="ks">CBS/RVO, 2024</div></div>
+<div class="kc r"><div class="kl">2030 Target</div><div class="kv">-55%</div><div class="ks">vs 1990 · Klimaatakkoord</div></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">GHG Emissions by Sector (2022, Mt CO₂eq)</div><div class="cst">Source: CBS / RIVM Emissieregistratie</div><canvas id="cl-sector"></canvas></div>
+<div class="cc"><div class="ct">Renewable Energy Share (%)</div><div class="cst">NL vs EU avg · Source: CBS / Eurostat</div><canvas id="cl-ren"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc"><div class="ct">CO₂ Emissions per Capita (metric tons)</div><div class="cst">Source: CBS / World Bank</div><canvas id="cl-co2pc"></canvas></div>
+<div class="cc"><div class="ct">Installed Renewable Capacity (GW)</div><div class="cst">Wind + Solar PV · Source: CBS / RVO</div><canvas id="cl-cap"></canvas></div>
+</div>
+<div class="cr">
+<div class="cc fw"><div class="ct">Total GHG Emissions Trajectory vs 2030 Target</div><div class="cst">Source: CBS / RIVM · Klimaatwet target: 55% reduction vs 1990</div><canvas id="cl-path"></canvas></div>
+</div>
+</div>
+
+<footer class="ft">
+<strong>Data Sources:</strong> CBS StatLine (opendata.cbs.nl) · Eurostat (ec.europa.eu/eurostat) · ECB Statistical Data Warehouse (data.ecb.europa.eu) · IMF World Economic Outlook (data.imf.org) · CPB Netherlands Bureau for Economic Policy Analysis (cpb.nl) · World Bank WDI (data.worldbank.org) · DNB (dnb.nl) · KvK · RIVM · RVO<br>
+All monetary values in EUR. Dashboard generated March 2026. Figures marked <span class="forecast-badge">FORECAST</span> are CPB projections (CEP 2025). 2024 figures may be provisional (CBS) or estimates (IMF/CPB).
+</footer>
+</div>
+
+<script>
+const Y=Array.from({length:25},(_,i)=>2000+i);
+const L=Y.map(String);
+const C=['#1e3a5f','#e87722','#2e8b57','#c0392b','#8e44ad','#2980b9','#d4a017','#16a085','#e74c3c','#34495e'];
+
+// === ALL DATA IN EUR ===
+const D={
+// GDP EUR billions (CBS national accounts)
+gdp:[417,447,465,477,491,513,540,572,594,573,588,602,599,602,616,637,660,687,714,731,700,769,847,879,910],
+// GDP forecasts (CPB CEP 2025)
+gdp_fc:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,910,925,938],
+gdp_fc_labels:[...L,'2025','2026'],
+// Real GDP growth CBS
+gdp_g:[4.2,2.1,0.1,-0.1,2.0,2.2,3.5,3.7,1.7,-3.7,1.3,1.6,-1.0,-0.1,1.4,2.0,2.2,2.9,2.4,2.0,-3.9,6.2,4.3,0.1,0.8],
+// CPB forecast growth
+gdp_g_fc:[...Array(25).fill(null),1.6,1.4],
+gdp_g_fc_labels:[...L,'2025','2026'],
+// GDP per capita EUR (CBS)
+gdppc:[26200,27800,28800,29400,30100,31400,33100,34900,36100,34700,35500,36100,35800,35900,36600,37700,38900,40300,41600,42300,40200,44000,48100,49400,50600],
+// Sectors % of GVA (CBS)
+agri:[2.5,2.5,2.3,2.2,2.1,2.0,1.9,1.8,1.7,1.7,1.8,1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.6,1.6,1.7,1.6,1.6,1.6,1.6],
+ind:[23.4,22.6,22.0,21.3,21.2,21.4,21.6,21.4,21.3,19.8,20.5,20.0,19.4,19.0,18.8,18.5,18.1,18.0,18.0,17.8,17.5,18.5,19.5,18.3,18.3],
+srv:[74.1,74.9,75.7,76.5,76.7,76.6,76.5,76.8,77.0,78.5,77.7,78.3,78.9,79.3,79.5,79.8,80.2,80.3,80.4,80.6,80.8,79.9,78.9,80.1,80.1],
+// Trade EUR billions (CBS)
+exp_bn:[232,229,233,234,256,281,318,346,370,311,371,425,443,449,454,420,416,455,479,480,437,529,613,555,580],
+imp_bn:[218,213,210,210,229,255,288,306,345,300,340,392,411,404,400,370,363,388,414,418,386,481,587,505,530],
+// Current account % GDP (DNB/IMF)
+ca:[1.9,2.4,2.5,5.5,7.5,6.3,8.3,6.7,4.3,5.2,7.0,8.8,10.2,9.8,8.5,6.3,8.1,10.8,10.8,9.4,7.0,9.5,8.0,9.5,9.2],
+// FDI % GDP
+fdi_in:[16.0,12.5,6.8,3.7,1.7,7.5,2.6,14.9,0.5,3.2,0.5,3.2,2.7,5.5,4.8,16.0,6.2,5.3,10.2,5.2,1.8,7.3,10.5,4.1,4.1],
+fdi_out:[14.6,10.0,7.5,5.3,4.8,14.2,7.0,10.5,4.3,2.2,4.8,5.2,3.9,10.4,5.5,14.8,12.0,6.8,3.5,6.4,6.0,8.9,5.0,5.5,5.0],
+// Fiscal (CBS/Eurostat/IMF)
+debt:[53.8,50.7,50.5,52.0,52.4,51.8,47.4,45.3,58.5,60.8,63.4,65.7,68.1,67.7,68.0,65.1,62.0,57.0,52.4,48.5,54.7,52.4,51.0,47.0,46.5],
+fbal:[2.0,0.0,-2.1,-3.1,-1.7,-0.3,0.5,0.2,0.5,-5.4,-5.0,-4.3,-3.9,-2.9,-2.2,-2.0,0.0,1.3,1.4,1.7,-3.7,-2.5,-0.1,-0.3,-1.8],
+grev:[44.2,43.4,42.6,42.2,42.5,43.0,44.0,44.3,45.5,43.3,43.5,43.2,43.7,43.9,43.9,43.0,43.4,43.8,44.0,44.3,44.1,44.6,43.5,43.9,43.8],
+gexp:[42.2,43.4,44.7,45.3,44.2,43.3,43.5,44.1,45.0,48.7,48.5,47.5,47.6,46.8,46.1,45.0,43.4,42.5,42.6,42.6,47.8,47.1,43.6,44.2,45.6],
+// Inflation (CBS/ECB)
+infl_nl:[2.3,5.1,3.9,2.2,1.4,1.5,1.7,1.6,2.2,1.0,0.9,2.5,2.8,2.6,0.3,-0.2,0.1,1.3,1.6,2.7,1.1,2.8,11.6,4.1,3.3],
+infl_ea:[2.1,2.4,2.3,2.1,2.2,2.2,2.2,2.1,3.3,0.3,1.6,2.7,2.5,1.4,0.4,0.2,0.2,1.5,1.8,1.2,0.3,2.6,8.4,5.4,2.4],
+ecb_rate:[4.75,3.25,2.75,2.00,2.00,2.25,3.50,4.00,2.50,1.00,1.00,1.00,0.75,0.25,0.05,0.05,0.00,0.00,0.00,0.00,0.00,0.00,2.50,4.50,2.65],
+// House price index CBS (2015=100)
+hpi:[68,76,82,85,87,90,94,98,101,98,96,94,88,83,83,87,93,100,109,117,126,147,163,162,173],
+// Household savings rate CBS
+save_rate:[7.2,9.8,8.5,7.8,7.5,6.8,6.5,7.2,6.5,8.8,7.5,8.0,8.2,8.5,8.8,8.5,8.2,7.8,7.2,7.6,16.5,13.8,10.2,12.5,14.8],
+// Unemployment CBS
+unemp:[3.1,2.5,3.1,4.1,5.1,5.3,4.4,3.6,3.1,3.7,4.5,4.4,5.3,6.7,7.4,6.9,6.0,4.9,3.8,3.4,3.8,4.2,3.5,3.6,3.6],
+unemp_f:[3.6,3.0,3.5,4.5,5.6,5.8,5.0,4.1,3.5,4.0,4.5,4.5,5.3,6.6,7.2,7.0,6.5,5.2,4.0,3.4,3.9,4.3,3.6,3.7,3.7],
+unemp_m:[2.6,2.1,2.8,3.8,4.7,4.8,3.9,3.1,2.8,3.5,4.5,4.4,5.3,6.7,7.5,6.8,5.6,4.6,3.7,3.4,3.7,4.1,3.4,3.5,3.5],
+unemp_y:[6.2,5.5,5.9,7.5,8.5,8.2,6.6,5.9,5.3,6.6,8.7,7.6,9.5,11.0,12.7,11.3,10.8,8.9,7.2,6.7,9.1,9.3,8.0,8.5,8.8],
+lfp:[66.3,66.6,67.2,67.0,66.7,66.4,67.0,68.0,68.7,68.8,68.1,67.6,68.0,67.9,67.2,66.6,66.9,67.5,68.4,69.3,69.8,70.7,72.0,73.0,73.2],
+lfp_f:[56.1,56.7,57.6,58.0,58.2,58.0,59.0,60.2,61.2,61.5,61.2,61.0,61.7,61.8,61.5,61.2,61.7,62.5,63.6,64.7,65.5,66.8,68.0,69.5,70.0],
+lfp_m:[76.5,76.5,76.8,76.0,75.2,74.8,75.0,75.8,76.2,76.1,75.0,74.2,74.3,74.0,72.9,72.0,72.1,72.5,73.2,73.9,74.1,74.6,76.0,76.5,76.4],
+// Employment by type CBS (millions)
+emp_fixed:[null,null,null,null,null,null,null,null,null,null,null,null,5.0,4.9,4.9,4.9,5.0,5.1,5.2,5.3,5.2,5.3,5.4,5.4,5.5],
+emp_flex:[null,null,null,null,null,null,null,null,null,null,null,null,1.6,1.6,1.7,1.7,1.8,1.9,2.0,2.0,1.8,1.9,2.0,2.1,2.1],
+emp_self:[null,null,null,null,null,null,null,null,null,null,null,null,1.0,1.0,1.0,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.2,1.2],
+emp_labels:L.slice(12),
+// Vacancies CBS (x1000)
+vac:[null,null,null,null,null,null,null,null,null,null,null,null,105,97,107,122,155,200,262,285,210,365,440,395,385],
+// Population CBS
+pop:[15.93,16.05,16.15,16.23,16.28,16.32,16.35,16.38,16.45,16.53,16.58,16.66,16.73,16.78,16.83,16.90,16.98,17.08,17.18,17.28,17.41,17.48,17.59,17.81,17.99],
+pop65:[13.6,13.6,13.7,13.8,13.9,14.0,14.2,14.5,14.7,15.0,15.3,15.6,16.2,16.8,17.3,17.8,18.2,18.5,18.8,19.2,19.5,19.8,20.0,20.3,20.5],
+// Consumer & producer confidence CBS
+cons_conf:[-4,-12,-15,-22,-8,-3,5,16,4,-32,-12,-17,-30,-28,-12,-3,0,18,18,2,-28,-3,-35,-22,-19],
+prod_conf:[5,-3,-5,-9,0,3,6,7,1,-18,0,-1,-6,-4,-2,0,2,7,6,0,-10,7,3,-5,-2],
+// New business registrations KvK (x1000)
+new_biz:[null,null,null,null,null,null,null,null,null,null,120,125,130,132,138,142,148,155,165,175,182,198,210,209,213],
+new_biz_labels:L.slice(10),
+// Bankruptcies CBS
+bankr:[null,null,null,null,null,null,null,null,null,null,7145,6625,7349,8376,6645,5271,4399,3291,3145,2811,1820,1737,2321,3780,4820],
+bankr_labels:L.slice(10),
+// R&D % GDP
+rd:[1.82,1.84,1.78,1.80,1.81,1.79,1.76,1.71,1.64,1.69,1.72,1.90,1.94,1.95,2.00,2.00,2.00,1.99,2.03,2.16,2.29,2.26,2.27,2.32,2.32],
+rd_eu:[1.77,1.79,1.81,1.82,1.80,1.82,1.84,1.85,1.92,1.97,1.99,2.01,2.04,2.07,2.08,2.09,2.10,2.11,2.12,2.14,2.20,2.17,2.17,2.20,2.20],
+// Internet CBS
+internet:[44,49,61,65,69,81,84,86,87,90,91,91,93,93,93,93,93,93,95,96,97,98,98,98,98],
+mobile:[67,77,75,77,92,97,104,110,119,116,117,116,117,116,116,124,124,124,125,127,127,128,129,129,129],
+// High-tech exports
+ht_exp:[29,27,26,27,25,25,22,20,18,18,19,18,18,18,19,20,20,20,20,19,21,20,20,20,20],
+// CO2 per capita
+co2pc:[11.1,11.2,11.0,11.2,11.2,10.9,10.5,10.5,10.5,10.3,10.6,9.9,9.5,9.3,8.8,9.0,9.2,9.0,8.6,8.1,7.4,7.9,7.8,7.7,7.8],
+// Total GHG (Mt CO2eq) CBS/RIVM
+ghg:[215,213,212,213,212,209,204,202,200,196,204,195,191,189,183,189,191,188,183,177,160,168,161,148,150],
+// Renewable % CBS
+ren_nl:[2.4,2.5,2.7,2.8,2.9,3.3,3.6,3.8,4.0,4.6,4.8,4.9,4.7,4.8,5.5,5.8,5.9,6.6,7.4,8.8,11.1,12.0,13.5,15.0,15.2],
+ren_eu:[6.5,6.8,7.0,7.4,8.0,8.5,9.0,10.0,11.0,12.0,12.9,13.2,14.3,15.0,16.1,16.7,17.0,17.5,18.0,19.7,22.0,21.8,23.0,24.0,24.5],
+// Wind + solar capacity GW CBS/RVO
+wind_gw:[0.4,0.5,0.7,0.9,1.0,1.2,1.5,1.7,2.0,2.2,2.2,2.3,2.4,2.7,2.8,3.0,3.3,3.5,3.5,4.5,6.1,7.4,8.5,9.6,10.8],
+solar_gw:[0,0,0,0,0,0,0,0,0.1,0.1,0.1,0.2,0.4,0.6,1.0,1.5,2.0,2.9,4.4,6.9,10.1,14.0,18.8,22.0,24.5],
+// Quarterly GDP growth CBS (q/q sa, 2019Q1 - 2024Q4)
+qgdp:[0.5,0.4,0.4,0.5,-1.5,-8.5,7.8,0.4,-0.9,3.6,-0.2,0.9,1.0,0.3,0.5,0.4,0.1,0.0,-0.3,0.5,-0.2,0.4,0.1,0.3],
+qgdp_labels:['19Q1','19Q2','19Q3','19Q4','20Q1','20Q2','20Q3','20Q4','21Q1','21Q2','21Q3','21Q4','22Q1','22Q2','22Q3','22Q4','23Q1','23Q2','23Q3','23Q4','24Q1','24Q2','24Q3','24Q4'],
+};
+
+// Tab switching
+function st(id,btn){
+    document.querySelectorAll('.tc').forEach(t=>t.classList.remove('act'));
+    document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('act'));
+    document.getElementById('t-'+id).classList.add('act');
+    btn.classList.add('act');
+    setTimeout(()=>Object.values(Chart.instances).forEach(c=>c.resize()),50);
+}
+
+// Chart helpers
+const bo=(yCb)=>({responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:10,font:{size:10}}},tooltip:{backgroundColor:'rgba(30,58,95,.95)',titleFont:{size:11},bodyFont:{size:10},padding:8,cornerRadius:6}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:45}},y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},callback:yCb||(v=>v)},beginAtZero:false}}});
+function lds(l,d,ci,o={}){return{label:l,data:d,borderColor:C[ci%C.length],backgroundColor:C[ci%C.length]+'20',borderWidth:2,fill:o.fill||false,tension:.3,pointRadius:o.pr||2,pointHoverRadius:5,borderDash:o.dash||[],yAxisID:o.yid||undefined,spanGaps:true}}
+function bds(l,d,ci,o={}){return{label:l,data:d,backgroundColor:C[ci%C.length]+(o.op||'CC'),borderColor:C[ci%C.length],borderWidth:1,borderRadius:3,yAxisID:o.yid||undefined}}
+
+document.addEventListener('DOMContentLoaded',()=>{
+// === OVERVIEW ===
+new Chart('ov-gdp',{type:'line',data:{labels:D.gdp_fc_labels,datasets:[
+    lds('GDP (€B, current)',D.gdp.concat([null,null]),0,{fill:true}),
+    {label:'CPB Forecast',data:[...Array(24).fill(null),910,925,938],borderColor:C[1],backgroundColor:C[1]+'20',borderWidth:2,borderDash:[6,4],pointRadius:3,tension:.3,fill:false,spanGaps:false}
+]},options:bo(v=>'€'+v+'B')});
+
+new Chart('ov-radar',{type:'radar',data:{labels:['GDP/cap (€k, NL÷EU×100)','Employment rate','R&D (% GDP ×50)','Trade openness (÷2)','Digital (internet%)','Life expectancy'],datasets:[
+    {label:'Netherlands',data:[131,96.4,116,81,98,82.1],borderColor:C[0],backgroundColor:C[0]+'30',pointBackgroundColor:C[0],borderWidth:2},
+    {label:'EU-27 Average',data:[100,94,100,50,87,80.6],borderColor:C[1],backgroundColor:C[1]+'30',pointBackgroundColor:C[1],borderWidth:2}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{r:{beginAtZero:true,ticks:{font:{size:8}},pointLabels:{font:{size:9}}}}}});
+
+new Chart('ov-qgdp',{type:'bar',data:{labels:D.qgdp_labels,datasets:[{label:'Q/Q GDP growth %',data:D.qgdp,backgroundColor:D.qgdp.map(v=>v>=0?C[2]+'CC':C[3]+'CC'),borderRadius:2}]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('ov-conf',{type:'line',data:{labels:L,datasets:[lds('Consumer Confidence',D.cons_conf,0),lds('Producer Confidence',D.prod_conf,1)]},options:{...bo(),scales:{...bo().scales,y:{...bo().scales.y,ticks:{callback:v=>v,font:{size:9}}}}}});
+
+new Chart('ov-multi',{type:'line',data:{labels:L,datasets:[lds('GDP Growth %',D.gdp_g,0),lds('Unemployment %',D.unemp,1),lds('Inflation %',D.infl_nl,3)]},options:bo(v=>v+'%')});
+
+// === MACRO ===
+new Chart('ma-grow',{type:'bar',data:{labels:D.gdp_g_fc_labels,datasets:[
+    {label:'Real GDP Growth',data:[...D.gdp_g,null,null],backgroundColor:D.gdp_g.map(v=>v>=0?C[2]+'CC':C[3]+'CC').concat(['',''])  ,borderRadius:3},
+    {label:'CPB Forecast',data:[...Array(25).fill(null),1.6,1.4],backgroundColor:[...Array(25).fill(''),...[C[1]+'99',C[1]+'99']],borderRadius:3}
+]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:true,labels:{usePointStyle:true,font:{size:10}}}}}});
+
+new Chart('ma-gdppc',{type:'line',data:{labels:L,datasets:[lds('GDP per capita (€)',D.gdppc,0,{fill:true})]},options:bo(v=>'€'+Math.round(v/1000)+'k')});
+
+new Chart('ma-sect',{type:'line',data:{labels:L,datasets:[lds('Services',D.srv,0),lds('Industry',D.ind,1),lds('Agriculture',D.agri,2)]},options:bo(v=>v+'%')});
+
+new Chart('ma-donut',{type:'doughnut',data:{labels:['Services (70.1%)','Industry (18.3%)','Agriculture (1.6%)','Other (10.0%)'],datasets:[{data:[70.1,18.3,1.6,10.0],backgroundColor:[C[0]+'CC',C[1]+'CC',C[2]+'CC',C[5]+'CC'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{usePointStyle:true,padding:10,font:{size:10}}}}}});
+
+new Chart('ma-eupps',{type:'bar',data:{labels:['🇱🇺 LUX','🇮🇪 IRL','🇩🇰 DNK','🇳🇱 NLD','🇦🇹 AUT','🇩🇪 DEU','🇧🇪 BEL','🇸🇪 SWE','🇫🇮 FIN','🇫🇷 FRA','🇮🇹 ITA','🇪🇸 ESP','EU-27'],datasets:[{label:'GDP/cap PPS (EU=100)',data:[261,238,137,131,126,120,118,117,113,110,96,88,100],backgroundColor:['#bbb','#bbb','#bbb',C[1]+'EE','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb',C[0]+'99'],borderRadius:3}]},options:{...bo(),indexAxis:'y',plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('ma-cpb',{type:'bar',data:{labels:['GDP growth','Inflation (CPI)','Unemployment','Purchasing power','Gov. balance (% GDP)'],datasets:[
+    bds('2025F',[1.6,2.9,4.0,0.6,-2.5],1),bds('2026F',[1.4,2.4,4.1,1.3,-2.8],0)
+]},options:{...bo(v=>v+'%'),indexAxis:'y',plugins:{...bo().plugins,legend:{display:true}}}});
+
+// === TRADE ===
+new Chart('tr-vol',{type:'line',data:{labels:L,datasets:[lds('Exports (€B)',D.exp_bn,0),lds('Imports (€B)',D.imp_bn,1,{dash:[5,5]})]},options:bo(v=>'€'+v+'B')});
+new Chart('tr-ca',{type:'bar',data:{labels:L,datasets:[bds('Current Account (% GDP)',D.ca,2)]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:false}}}});
+new Chart('tr-prod',{type:'bar',data:{labels:['Machinery &\ntransport','Chemicals','Mineral\nfuels','Food &\nagriculture','Manufactured\ngoods','Misc.\nmanufactured'],datasets:[{label:'€ billions',data:[152,105,82,72,58,48],backgroundColor:[C[0]+'CC',C[1]+'CC',C[3]+'CC',C[2]+'CC',C[5]+'CC',C[4]+'CC'],borderRadius:3}]},options:{...bo(v=>'€'+v+'B'),plugins:{...bo().plugins,legend:{display:false}}}});
+new Chart('tr-fdi',{type:'line',data:{labels:L,datasets:[lds('FDI Inflows (% GDP)',D.fdi_in,0),lds('FDI Outflows (% GDP)',D.fdi_out,1,{dash:[5,5]})]},options:bo(v=>v+'%')});
+
+// === FISCAL ===
+new Chart('fi-debt',{type:'line',data:{labels:L,datasets:[lds('NL Gov. Debt (% GDP)',D.debt,0,{fill:true}),{label:'Maastricht 60%',data:Array(25).fill(60),borderColor:C[3],borderWidth:2,borderDash:[8,4],pointRadius:0,fill:false}]},options:bo(v=>v+'%')});
+new Chart('fi-bal',{type:'bar',data:{labels:L,datasets:[{label:'Fiscal Balance',data:D.fbal,backgroundColor:D.fbal.map(v=>v>=0?C[2]+'CC':C[3]+'CC'),borderRadius:3}]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:false}}}});
+new Chart('fi-revexp',{type:'line',data:{labels:L,datasets:[lds('Revenue (% GDP)',D.grev,2),lds('Expenditure (% GDP)',D.gexp,3)]},options:bo(v=>v+'%')});
+new Chart('fi-cofog',{type:'doughnut',data:{labels:['Social protection (32%)','Health (15%)','Education (11%)','General public services (10%)','Economic affairs (10%)','Defense & security (8%)','Other (14%)'],datasets:[{data:[32,15,11,10,10,8,14],backgroundColor:[C[0]+'CC',C[2]+'CC',C[5]+'CC',C[1]+'CC',C[4]+'CC',C[3]+'CC',C[9]+'CC'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'50%',plugins:{legend:{position:'right',labels:{usePointStyle:true,padding:8,font:{size:9}}}}}});
+new Chart('fi-eudebt',{type:'bar',data:{labels:['🇬🇷 GRC','🇮🇹 ITA','🇫🇷 FRA','🇪🇸 ESP','🇧🇪 BEL','🇵🇹 PRT','🇦🇹 AUT','🇩🇪 DEU','🇫🇮 FIN','🇳🇱 NLD','🇮🇪 IRL','🇩🇰 DNK','🇸🇪 SWE','EU-27'],datasets:[{label:'Gov. Debt % GDP 2024',data:[160,137,112,105,105,98,77,63,77,46.5,42,29,31,82],backgroundColor:['#bbb','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb',C[2]+'EE','#bbb','#bbb','#bbb',C[0]+'99'],borderRadius:3}]},options:{...bo(v=>v+'%'),indexAxis:'y',plugins:{...bo().plugins,legend:{display:false}}}});
+
+// === MONETARY ===
+new Chart('mo-infl',{type:'line',data:{labels:L,datasets:[lds('NL HICP',D.infl_nl,0),lds('Euro Area HICP',D.infl_ea,1,{dash:[5,5]}),{label:'ECB Target (2%)',data:Array(25).fill(2),borderColor:C[3],borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false}]},options:bo(v=>v+'%')});
+new Chart('mo-rate',{type:'line',data:{labels:L,datasets:[lds('ECB Main Refi Rate',D.ecb_rate,0)]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:false}}}});
+new Chart('mo-house',{type:'line',data:{labels:L,datasets:[lds('House Price Index (2015=100)',D.hpi,1,{fill:true})]},options:{...bo(),plugins:{...bo().plugins,legend:{display:false}}}});
+new Chart('mo-save',{type:'line',data:{labels:L,datasets:[lds('Household Savings Rate %',D.save_rate,2,{fill:true})]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:false}}}});
+
+// === LABOR ===
+new Chart('la-unemp',{type:'line',data:{labels:L,datasets:[lds('Total',D.unemp,0),lds('Female',D.unemp_f,1,{dash:[5,5]}),lds('Male',D.unemp_m,2,{dash:[3,3]}),lds('Youth (15-24)',D.unemp_y,3)]},options:bo(v=>v+'%')});
+new Chart('la-lfp',{type:'line',data:{labels:L,datasets:[lds('Total',D.lfp,0),lds('Female',D.lfp_f,1),lds('Male',D.lfp_m,2)]},options:bo(v=>v+'%')});
+
+new Chart('la-type',{type:'bar',data:{labels:D.emp_labels,datasets:[
+    bds('Fixed contract',D.emp_fixed,0),bds('Flexible',D.emp_flex,1),bds('Self-employed',D.emp_self,2)
+]},options:{...bo(v=>v+'M'),scales:{...bo().scales,x:{...bo().scales.x,stacked:true},y:{...bo().scales.y,stacked:true,ticks:{callback:v=>v+'M',font:{size:9}}}}}});
+
+new Chart('la-vac',{type:'line',data:{labels:D.emp_labels,datasets:[
+    lds('Vacancies (×1,000)',D.vac.slice(-13),1),
+    lds('Unemployment %',D.unemp.slice(12),0,{yid:'y1'})
+]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{position:'left',grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'k',font:{size:9}},title:{display:true,text:'Vacancies',font:{size:9}}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>v+'%',font:{size:9}},title:{display:true,text:'Unemployment %',font:{size:9}}}}}});
+
+new Chart('la-pop',{type:'line',data:{labels:L,datasets:[lds('Population (M)',D.pop,0,{fill:true}),lds('65+ share (%)',D.pop65,3,{yid:'y1'})]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{position:'left',grid:{color:'#f0f0f0'},ticks:{callback:v=>v+'M',font:{size:9}},title:{display:true,text:'Population (M)',font:{size:9}}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>v+'%',font:{size:9}},title:{display:true,text:'65+ share %',font:{size:9}}}}}});
+
+new Chart('la-euyouth',{type:'bar',data:{labels:['🇪🇸 ESP','🇬🇷 GRC','🇮🇹 ITA','🇸🇪 SWE','🇫🇷 FRA','🇧🇪 BEL','🇫🇮 FIN','EU-27','🇮🇪 IRL','🇦🇹 AUT','🇩🇰 DNK','🇳🇱 NLD','🇩🇪 DEU'],datasets:[{label:'Youth Unemployment %',data:[27.4,26.1,20.8,20.4,17.2,14.5,14.0,14.5,10.2,10.0,9.5,8.8,6.1],backgroundColor:['#bbb','#bbb','#bbb','#bbb','#bbb','#bbb','#bbb',C[0]+'99','#bbb','#bbb','#bbb',C[2]+'EE','#bbb'],borderRadius:3}]},options:{...bo(v=>v+'%'),indexAxis:'y',plugins:{...bo().plugins,legend:{display:false}}}});
+
+// === INNOVATION ===
+new Chart('in-rd',{type:'line',data:{labels:L,datasets:[lds('NL R&D (% GDP)',D.rd,0,{fill:true}),lds('EU-27 Average',D.rd_eu,1,{dash:[6,4]})]},options:bo(v=>v+'%')});
+
+new Chart('in-biz',{type:'bar',data:{labels:D.new_biz_labels,datasets:[bds('New Registrations (×1,000)',D.new_biz.filter(v=>v!==null),2)]},options:{...bo(v=>v+'k'),plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('in-dig',{type:'line',data:{labels:L,datasets:[lds('Internet Users (%)',D.internet,0),lds('Mobile per 100',D.mobile,1)]},options:bo()});
+
+new Chart('in-euscore',{type:'bar',data:{labels:['🇩🇰 DNK','🇸🇪 SWE','🇫🇮 FIN','🇧🇪 BEL','🇮🇪 IRL','🇳🇱 NLD','🇦🇹 AUT','🇩🇪 DEU','🇱🇺 LUX','🇫🇷 FRA'],datasets:[{label:'Innovation Index 2024',data:[152,148,140,138,133,131,127,122,120,113],backgroundColor:['#bbb','#bbb','#bbb','#bbb','#bbb',C[1]+'EE','#bbb','#bbb','#bbb','#bbb'],borderRadius:3}]},options:{...bo(),indexAxis:'y',plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('in-bankr',{type:'line',data:{labels:D.bankr_labels,datasets:[lds('Bankruptcies',D.bankr.filter(v=>v!==null),3)]},options:{...bo(v=>v>=1000?(v/1000).toFixed(1)+'k':v),plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('in-ht',{type:'line',data:{labels:L,datasets:[lds('High-Tech Exports (% manuf.)',D.ht_exp,1)]},options:{...bo(v=>v+'%'),plugins:{...bo().plugins,legend:{display:false}}}});
+
+// === CLIMATE ===
+new Chart('cl-sector',{type:'bar',data:{labels:['Energy\nproduction','Industry','Agriculture','Transport','Built\nenvironment','Other'],datasets:[{label:'Mt CO₂eq (2022)',data:[42,29,27,25,22,16],backgroundColor:[C[3]+'CC',C[0]+'CC',C[2]+'CC',C[1]+'CC',C[5]+'CC',C[9]+'CC'],borderRadius:3}]},options:{...bo(v=>v+' Mt'),plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('cl-ren',{type:'line',data:{labels:L,datasets:[lds('NL Renewable %',D.ren_nl,2,{fill:true}),lds('EU-27 Average %',D.ren_eu,0,{dash:[6,4]})]},options:bo(v=>v+'%')});
+
+new Chart('cl-co2pc',{type:'line',data:{labels:L,datasets:[lds('CO₂ per capita (t)',D.co2pc,3)]},options:{...bo(v=>v+' t'),plugins:{...bo().plugins,legend:{display:false}}}});
+
+new Chart('cl-cap',{type:'line',data:{labels:L,datasets:[lds('Wind (GW)',D.wind_gw,5),lds('Solar PV (GW)',D.solar_gw,6)]},options:bo(v=>v+' GW')});
+
+// GHG emissions path with 2030 target
+const ghg_ext=[...D.ghg,145,140,135,130,125,118];
+const ghg_labels=[...L,'2025','2026','2027','2028','2029','2030'];
+const target_1990=D.ghg[0];// ~215
+const target_2030=target_1990*0.45;// 55% reduction = 45% of 1990
+new Chart('cl-path',{type:'line',data:{labels:ghg_labels,datasets:[
+    {label:'Actual GHG (Mt CO₂eq)',data:[...D.ghg,...Array(6).fill(null)],borderColor:C[0],backgroundColor:C[0]+'20',borderWidth:2.5,fill:true,tension:.3,pointRadius:2,spanGaps:false},
+    {label:'Projected path',data:[...Array(24).fill(null),D.ghg[24],145,140,135,130,125,118],borderColor:C[1],borderWidth:2,borderDash:[6,4],pointRadius:2,fill:false,tension:.3,spanGaps:false},
+    {label:'2030 Target (~97 Mt, -55% vs 1990)',data:Array(ghg_labels.length).fill(target_2030),borderColor:C[3],borderWidth:2,borderDash:[4,4],pointRadius:0,fill:false}
+]},options:bo(v=>v+' Mt')});
+
+});
+</script>
+</body>
+</html>
